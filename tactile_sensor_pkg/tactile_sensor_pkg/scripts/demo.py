@@ -6,7 +6,7 @@ import numpy as np
 import os
 import pandas as pd
 import time
-from . import PKG_DIR
+from tactile_sensor_pkg.scripts import PKG_DIR
 
 touch = TACTILE(vertice_file= PKG_DIR+"/config/tactile_vertice.json",
                     param_file=PKG_DIR+'/test_img/config/draw_black_04.json',
@@ -18,7 +18,7 @@ refimage = cv2.imread(reference_path)
 
 if __name__=='__main__':
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(6)
     cap.set(cv2.CAP_PROP_FOURCC,
                      cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
@@ -57,7 +57,7 @@ if __name__=='__main__':
         hsv_image = cv2.cvtColor(stitched_image,cv2.COLOR_BGR2HSV)
         hsv_image = stitch.classify(hsv_image,160,250) #160,250
         hsved_image = cv2.cvtColor(hsv_image,cv2.COLOR_HSV2RGB)
-        blob_image,_,_ = stitch.draw_black(hsved_image,param_file='./test_img/config/draw_black_04.json')
+        blob_image,_,_ = stitch.draw_black(hsved_image,param_file=PKG_DIR+'/test_img/config/draw_black_04.json')
         touch.find_ref(refimage)
         flow_2d = touch.get_disp(blob_image)
 

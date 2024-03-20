@@ -4,8 +4,8 @@ import numpy as np
 import json
 from sklearn.neighbors import KDTree
 from scipy.interpolate import griddata
-from ..src.tactile.nHHD import *
-from ..src import getStitched
+from tactile_sensor_pkg.src.tactile.nHHD import *
+from tactile_sensor_pkg.src import getStitched
 #import ..src.getStitched as getStitched
 
 import matplotlib.pyplot as plt

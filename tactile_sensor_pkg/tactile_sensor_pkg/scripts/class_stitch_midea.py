@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import sys
 from skimage import io
-from . import PKG_DIR
+from tactile_sensor_pkg.scripts import PKG_DIR
 
 sensor_id = '04'
 
