@@ -4,10 +4,10 @@ import sys
 import rospy
 import time
 import cv2
-
+import math
 # We are assuming we have access to the following classes
-from gripper_interface import Gripper
-from class_tactile_midea import TactileInterface
+from .gripper_interface import Gripper
+from tactile_sensor_pkg.scripts.tactile_force import TactileForce
 
 
 class PID():
@@ -87,13 +87,14 @@ class PID():
 
         
 class ForceConroller():
-    def __init__(self, router, friction_coeff, max_output_val, gains, tacile_threshold):
+    def __init__(self, router, camera_id, tacile_threshold, friction_coeff, max_output_val, gains):
         """
         router:             type ....
         friction_coeff:     type float
         max_output_val:     type float
         gains:              type dict, {"kp": float, "ki": float, "kd":float}
         tacile_threshold:   type int
+        camera_id:          type int
         """
         self.friction_coeff = friction_coeff
         self.max_output_val = max_output_val  
@@ -102,7 +103,7 @@ class ForceConroller():
         self.gripper_block = Gripper(router)
 
         # WE NEED TO DISCUSS HOW TactileInterface is really implemented
-        self.tactile_sensor_block = TactileInterface(tacile_threshold)
+        self.tactile_sensor_block = TactileForce(camera_id, tacile_threshold)
     # setpoint, measure_varible, external_tracking_signal
 
     def forward(self, error):
@@ -125,21 +126,18 @@ class ForceConroller():
         # measure the force
         self.gripper_block.gripper_width(x)
 
-    def feedback(self):
-        # MODIFY IT 
+    def feedback(self, magnitude=False):
+        """
+        magnitude:  type bool
+        """
         force_x, force_y = self.tactile_sensor_block.force_components(self.cap)
+        
+        if magnitude:
+            return math.sqrt(force_x**2 + force_y**2)
+        else:
+            return force_x, force_y
         
 
     def backward(self):
         pass
 
-
-
-
-
-
-def main():
-    pass
-
-if __name__ == "__main__":
-    main()

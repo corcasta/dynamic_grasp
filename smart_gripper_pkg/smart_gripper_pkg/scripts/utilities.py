@@ -45,9 +45,7 @@ class DeviceConnection:
         self.transport = TCPTransport() if port == DeviceConnection.TCP_PORT else UDPTransport()
         self.router = RouterClient(self.transport, RouterClient.basicErrorCallback)
 
-    # Called when entering 'with' statement
-    def __enter__(self):
-        
+    def open_connection(self):
         self.transport.connect(self.ipAddress, self.port)
 
         if (self.credentials[0] != ""):
@@ -63,9 +61,7 @@ class DeviceConnection:
 
         return self.router
 
-    # Called when exiting 'with' statement
-    def __exit__(self, exc_type, exc_value, traceback):
-    
+    def close_connection(self):
         if self.sessionManager != None:
 
             router_options = RouterClientSendOptions()
@@ -74,3 +70,13 @@ class DeviceConnection:
             self.sessionManager.CloseSession(router_options)
 
         self.transport.disconnect()
+
+    # Called when entering 'with' statement
+    def __enter__(self):
+        return self.open_connection()
+
+
+    # Called when exiting 'with' statement
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close_connection()
+        

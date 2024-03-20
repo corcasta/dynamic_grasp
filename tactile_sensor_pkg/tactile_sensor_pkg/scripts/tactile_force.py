@@ -4,7 +4,7 @@ from .class_stitch_midea import Stitch
 from .class_tactile_midea import TACTILE
 from . import PKG_DIR
 
-class ForceSensor(object):
+class TactileForce(object):
 
     def __init__(self, camera_id, tacile_threshold=45):
         self.stitch = Stitch()
@@ -19,7 +19,7 @@ class ForceSensor(object):
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 
-    def force_components(self, cap):
+    def get_components(self, cap):
         try:
             _,original_image = cap.read()
             self.stitch.get_coordinates(original_image)
