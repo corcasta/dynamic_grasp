@@ -1,0 +1,11 @@
+{"vertices":
+ {"vertice1": {"left_top": [222.0, 60.0], "right_bottom": [302.0, 140.0]}, 
+ "vertice2": {"left_top": [355.0, 50.0], "right_bottom": [435.0, 130.0]}, 
+ "vertice3": {"left_top": [490.0, 40.0], "right_bottom": [570.0, 120.0]}, 
+ "vertice4": {"left_top": [235.0, 190.0], "right_bottom": [315.0, 270.0]}, 
+ "vertice5": {"left_top": [370.0, 187.0], "right_bottom": [450.0, 267.0]}, 
+ "vertice6": {"left_top": [500.0, 180.0], "right_bottom": [580.0, 260.0]}, 
+ "vertice7": {"left_top": [240.0, 335.0], "right_bottom": [320.0, 415.0]}, 
+ "vertice8": {"left_top": [375.0, 335.0], "right_bottom": [455.0, 415.0]}, 
+ "vertice9": {"left_top": [505.0, 338.0], "right_bottom": [585.0, 418.0]}
+}}

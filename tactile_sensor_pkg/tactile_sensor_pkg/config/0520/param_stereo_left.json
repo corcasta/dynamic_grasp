@@ -1,0 +1,12 @@
+{
+    "blockSize": 3,
+    "numDisparities": 96,
+    "P1": 900,
+    "P2": 1650,
+    "minDisparity": 6,
+    "disp12MaxDiff": 0,
+    "preFilterCap": 15,
+    "uniquenessRatio": 5,
+    "speckleWindowSize": 50,
+    "speckleRange": 2
+}

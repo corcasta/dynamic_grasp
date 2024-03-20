@@ -1,0 +1,15 @@
+{
+    "blobColor": 0,
+    "filterByArea": true,
+    "filterByCircularity": true,
+    "filterByColor": false,
+    "filterByConvexity": true,
+    "filterByInertia": false,
+    "maxArea": 1600,
+    "maxThreshold": 255,
+    "minArea": 400,
+    "minCircularity": 0.1,
+    "minConvexity": 0.1,
+    "minInertiaRatio": 300,
+    "minThreshold": 0
+}

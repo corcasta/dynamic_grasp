@@ -1,0 +1,6 @@
+{
+    "Lambda": 9554,
+    "LRCthresh": 9,
+    "DepthDiscontinuityRadius": 3,
+    "SigmaColor": 1.411
+}
