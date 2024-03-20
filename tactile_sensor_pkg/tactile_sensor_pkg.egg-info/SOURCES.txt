@@ -1,6 +1,0 @@
-setup.py
-tactile_sensor_pkg/__init__.py
-tactile_sensor_pkg.egg-info/PKG-INFO
-tactile_sensor_pkg.egg-info/SOURCES.txt
-tactile_sensor_pkg.egg-info/dependency_links.txt
-tactile_sensor_pkg.egg-info/top_level.txt
