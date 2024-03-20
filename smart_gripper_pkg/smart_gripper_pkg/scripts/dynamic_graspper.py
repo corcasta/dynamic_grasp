@@ -3,7 +3,7 @@
 import sys
 import rospy
 import time
-import opencv as cv2
+import cv2
 
 # We are assuming we have access to the following classes
 from gripper_interface import Gripper

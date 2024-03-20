@@ -6,14 +6,14 @@ from . import PKG_DIR
 
 class ForceSensor(object):
 
-    def __init__(self, tacile_threshold=45):
+    def __init__(self, camera_id, tacile_threshold=45):
         self.stitch = Stitch()
         self.touch = TACTILE(param_file=PKG_DIR + "/config/tactile_config/blob.json",
                              threshold=tacile_threshold)
         reference_path = "----/config/tactile_config/reference.png"
         self.refimage = cv2.imread(reference_path)
         
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(camera_id)
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
