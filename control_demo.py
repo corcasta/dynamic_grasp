@@ -17,16 +17,16 @@ def main():
     print("LOGGING IN to Gripper Session")
 
     # STEP-2) Run closed loop system
-    set_point = 25  # Force Magnitude we want to achieve
+    set_point = 120  # Force Magnitude we want to achieve
     controller_params = {
         "router": router,
         "camera_id": 7,
         "tactile_threshold": 45,
         "sleep_time": 0.1,
         "friction_coeff": 0.1,
-        "max_output_val": 100.0,
-        "min_output_val": 15.0,
-        "gains": {"kp": 1.0, "ki": 0.0, "kd": 0.1}
+        "max_output_val": 200.0,
+        "min_output_val": 0.0,
+        "gains": {"kp": 0.002, "ki": 0, "kd": 0.5}
         }
     
     force_controller = ForceController(**controller_params)

@@ -18,6 +18,14 @@ class Gripper:
         self.gripper_command = Base_pb2.GripperCommand()
         self.finger = self.gripper_command.gripper.finger.add()
 
+    def gripper_position(self):        
+        gripper_request = Base_pb2.GripperRequest()
+        gripper_request.mode = Base_pb2.GRIPPER_POSITION
+        gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
+        position = gripper_measure.finger[0].value  
+        return position
+
+        
     def gripper_width(self,width):
         """
         width: type float, range value between (0-1)

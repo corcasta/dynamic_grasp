@@ -96,6 +96,9 @@ class ForceController():
         self.friction_coeff = friction_coeff
         self.max_output_val = max_output_val
         self.min_output_val = min_output_val  
+        self.force_x_filter = []
+        self.force_y_filter = []
+        self.filter = []
 
         self.pid_block = PID(**gains)
         self.gripper_block = Gripper(router, sleep_time=sleep_time)
@@ -114,16 +117,29 @@ class ForceController():
         # maximum value we can actually get.
 
         # Min-max normalization
-        normalized_error = (error - self.min_output_val)/(self.max_output_val - self.min_output_val)
-        x = self.pid_block.forward(normalized_error)
+        offset = (65 - self.min_output_val)/(self.max_output_val - self.min_output_val) 
+        normalized_error = (error - self.min_output_val)/(self.max_output_val - self.min_output_val) #+ offset 
+        print(f"Normalized error: {normalized_error}")
+        
+        delta_x = self.pid_block.forward(normalized_error)
+        #delta_x = 0.1 * delta_x # FOR SAFETY WHILE TESTING ARM, DELETE ONCE 
+        print(f"PID output: {delta_x}")
+        
         # The gripper block is receiving inputs between 0 and 1
         # 0 means completely opened, 1 means completely closed
-        x = 0 if x < 0 else 1 if x > 1 else x
 
         # Given that we are not measuring the gripper distance
         # there's nothing to return, on feedback we are going to 
         # measure the force
-        self.gripper_block.gripper_width(x)
+
+        #88888888888888888888888888888
+        # READ GRIPPER POSITION
+        #88888888888888888888888888888
+        new_position = delta_x + self.gripper_block.gripper_position()
+        new_position = 0 if new_position < 0 else 1 if new_position > 1 else new_position
+        print(f"New position: {new_position}")
+        self.gripper_block.gripper_width(new_position)
+        
 
     def feedback(self, magnitude=False):
         """
@@ -131,10 +147,21 @@ class ForceController():
         """
         force_x, force_y = self.tactile_sensor_block.get_components(self.tactile_sensor_block.cap)
         
+        self.force_x_filter.append(force_x)
+        self.force_y_filter.append(force_y)
+        
+        if len(self.force_x_filter) > 10:
+            self.force_x_filter.pop(0)
+            self.force_y_filter.pop(0)
+
+        avg_force_x = sum(self.force_x_filter)/len(self.force_x_filter)
+        avg_force_y = sum(self.force_y_filter)/len(self.force_y_filter)
+        
         if magnitude:
-            return math.sqrt(force_x**2 + force_y**2)
+            avg_mag = math.sqrt(avg_force_x**2 + avg_force_y**2)
+            return avg_mag
         else:
-            return force_x, force_y
+            return avg_force_x, avg_force_y
         
         
 

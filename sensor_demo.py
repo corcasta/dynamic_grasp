@@ -38,7 +38,7 @@ if __name__=='__main__':
     # Set plot properties
     ax1.set_xlabel('Time')
     ax1.set_ylabel('Tactile')
-    ax1.set_ylim(0,220)
+    ax1.set_ylim(0,320)
     ax2.set_ylabel('Stereo')
     ax2.set_ylim(0,70)
     ax1.set_title('Real-time Plot')
@@ -81,7 +81,7 @@ if __name__=='__main__':
         x_data.append(counter)  # Use timestamps as x-axis value
         y_data1.append(m)
         y_data2.append(0)        
-        if len(x_data) > 21:
+        if len(x_data) > 30:
             x_data.pop(0)
             y_data1.pop(0)
             y_data2.pop(0)
