@@ -6,8 +6,9 @@ from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.messages import Base_pb2
 
 class Gripper:
-    def __init__(self, router, proportional_gain = 1.0):
+    def __init__(self, router, proportional_gain = 1.0, sleep_time=0.5):
 
+        self.sleep_time = sleep_time
         self.proportional_gain = proportional_gain
         self.router = router
 
@@ -27,7 +28,7 @@ class Gripper:
 
         self.finger.value = position
         self.base.SendGripperCommand(self.gripper_command)
-        time.sleep(.5)
+        time.sleep(self.sleep_time)
 
     def gripper_vel(self,vel):
         print ("Opening gripper using speed command...")

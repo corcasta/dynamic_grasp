@@ -87,24 +87,27 @@ class PID():
 
         
 class ForceConroller():
-    def __init__(self, router, camera_id, tacile_threshold, friction_coeff, max_output_val, gains):
+    def __init__(self, router, camera_id, tactile_threshold, sleep_time, friction_coeff, max_output_val, min_output_val, gains):
         """
         router:             type ....
+        camera_id:          type int
+        tactile_threshold:  type int
+        sleep_time:         type float (value between 0.1 - 1.0)
         friction_coeff:     type float
         max_output_val:     type float
         gains:              type dict, {"kp": float, "ki": float, "kd":float}
-        tacile_threshold:   type int
-        camera_id:          type int
         """
         self.friction_coeff = friction_coeff
-        self.max_output_val = max_output_val  
+        self.max_output_val = max_output_val
+        self.min_output_val = min_output_val  
 
         self.pid_block = PID(*gains)
-        self.gripper_block = Gripper(router)
+        self.gripper_block = Gripper(router, sleep_time=sleep_time)
 
         # WE NEED TO DISCUSS HOW TactileInterface is really implemented
-        self.tactile_sensor_block = TactileForce(camera_id, tacile_threshold)
-    # setpoint, measure_varible, external_tracking_signal
+        self.tactile_sensor_block = TactileForce(camera_id, tactile_threshold)
+    
+    # setpoint, measure_variable, external_tracking_signal
 
     def forward(self, error):
         # We may need to discretize sensor reading values
@@ -115,7 +118,7 @@ class ForceConroller():
         # maximum value we can actually get.
 
         # Min-max normalization
-        normalized_error = (error - 0.0)/(self.max_output_val - 0.0)
+        normalized_error = (error - self.min_output_val)/(self.max_output_val - self.min_output_val)
         x = self.pid_block.forward(normalized_error)
         # The gripper block is receiving inputs between 0 and 1
         # 0 means completely opened, 1 means completely closed
@@ -137,7 +140,5 @@ class ForceConroller():
         else:
             return force_x, force_y
         
-
-    def backward(self):
-        pass
+        
 
