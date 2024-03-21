@@ -1,6 +1,7 @@
+import os   
 import sys
 import argparse
-from smart_gripper_pkg.scripts.gripper_interface import DeviceConnection, parseConnectionArguments
+from smart_gripper_pkg.scripts.utilities import DeviceConnection, parseConnectionArguments
 from smart_gripper_pkg.scripts.dynamic_graspper import ForceController
 
 def main(): 
@@ -13,20 +14,24 @@ def main():
     # Setup API
     device = DeviceConnection.createTcpConnection(args)
     router = device.login()
-    print("LOGGING IN to Gripper Session"
+    print("LOGGING IN to Gripper Session")
 
     # STEP-2) Run closed loop system
     set_point = 25  # Force Magnitude we want to achieve
     controller_params = {
         "router": router,
-        "camera_id": XX,
+        "camera_id": 7,
         "tactile_threshold": 45,
-        "sleep_time": 0.1, 
+        "sleep_time": 0.1,
+        "friction_coeff": 0.1,
+        "max_output_val": 100.0,
+        "min_output_val": 15.0,
         "gains": {"kp": 1.0, "ki": 0.0, "kd": 0.1}
         }
     
-    force_controller = ForceController(*controller_params)
-    error = set_point - force_controller.feedback(magnitude=True)
+    force_controller = ForceController(**controller_params)
+    measure_variable = force_controller.feedback(magnitude=True)
+    error = set_point - measure_variable
     print(f"Target Force: {set_point} \t Measure Force: {measure_variable} \t Error: {error}")
 
     try:

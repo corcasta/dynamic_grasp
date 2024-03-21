@@ -14,7 +14,7 @@ touch = TACTILE(vertice_file= PKG_DIR+"/config/tactile_vertice.json",
 stitch = Stitch()
 
 
-TACTILE_SENSOR_DEVICE_ID = 6
+TACTILE_SENSOR_DEVICE_ID = 7
 reference_path = PKG_DIR+"/config/tactile_config/tactile_4/reference3.png"
 refimage = cv2.imread(reference_path)
 
@@ -63,8 +63,8 @@ if __name__=='__main__':
         touch.find_ref(refimage)
         flow_2d = touch.get_disp(blob_image)
 
-        u = flow_2d[:,0]
-        v = flow_2d[:,1]
+        u = flow_2d[:,:,0].sum()
+        v = flow_2d[:,:,1].sum()
 
         magnitude = np.sqrt(u**2+v**2)
         magnitude = np.sum(magnitude)

@@ -174,6 +174,7 @@ class TACTILE(KDTree, nHHD):
                                         (self.grid_x, self.grid_y), method='cubic')
             self.grid_vector[np.isnan(self.grid_vector)] = 0            
 
+        # return self.grid_vector
         return self.grid_vector
         
     def draw_grid_vector(self,img,grid_vector):

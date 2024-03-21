@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-
-import sys
-import rospy
 import time
-import cv2
 import math
 # We are assuming we have access to the following classes
 from .gripper_interface import Gripper
@@ -35,7 +31,7 @@ class PID():
         if kd:
             self.kd = kd
         else:
-            self.kd = 0.0
+            self.kd = 0.1
 
 
     def update_time_variables(self):
@@ -61,7 +57,7 @@ class PID():
             self.kd = kd
 
 
-    def propotional_block(self, error):
+    def proportional_block(self, error):
         return self.kp*error
 
 
@@ -86,7 +82,7 @@ class PID():
         return pid_output
 
         
-class ForceConroller():
+class ForceController():
     def __init__(self, router, camera_id, tactile_threshold, sleep_time, friction_coeff, max_output_val, min_output_val, gains):
         """
         router:             type ....
@@ -101,7 +97,7 @@ class ForceConroller():
         self.max_output_val = max_output_val
         self.min_output_val = min_output_val  
 
-        self.pid_block = PID(*gains)
+        self.pid_block = PID(**gains)
         self.gripper_block = Gripper(router, sleep_time=sleep_time)
 
         # WE NEED TO DISCUSS HOW TactileInterface is really implemented
@@ -133,7 +129,7 @@ class ForceConroller():
         """
         magnitude:  type bool
         """
-        force_x, force_y = self.tactile_sensor_block.force_components(self.cap)
+        force_x, force_y = self.tactile_sensor_block.get_components(self.tactile_sensor_block.cap)
         
         if magnitude:
             return math.sqrt(force_x**2 + force_y**2)
