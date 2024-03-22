@@ -122,7 +122,7 @@ class ForceController():
         print(f"Normalized error: {normalized_error}")
         
         delta_x = self.pid_block.forward(normalized_error)
-        #delta_x = 0.1 * delta_x # FOR SAFETY WHILE TESTING ARM, DELETE ONCE 
+        delta_x = 0.1 * delta_x # FOR SAFETY WHILE TESTING ARM, DELETE ONCE 
         print(f"PID output: {delta_x}")
         
         # The gripper block is receiving inputs between 0 and 1
@@ -147,21 +147,22 @@ class ForceController():
         """
         force_x, force_y = self.tactile_sensor_block.get_components(self.tactile_sensor_block.cap)
         
-        self.force_x_filter.append(force_x)
-        self.force_y_filter.append(force_y)
-        
-        if len(self.force_x_filter) > 10:
-            self.force_x_filter.pop(0)
-            self.force_y_filter.pop(0)
+        #self.force_x_filter.append(force_x)
+        #self.force_y_filter.append(force_y)
+        #
+        #if len(self.force_x_filter) > 10:
+        #    self.force_x_filter.pop(0)
+        #    self.force_y_filter.pop(0)
 
-        avg_force_x = sum(self.force_x_filter)/len(self.force_x_filter)
-        avg_force_y = sum(self.force_y_filter)/len(self.force_y_filter)
+        #avg_force_x = sum(self.force_x_filter)/len(self.force_x_filter)
+        #avg_force_y = sum(self.force_y_filter)/len(self.force_y_filter)
         
         if magnitude:
-            avg_mag = math.sqrt(avg_force_x**2 + avg_force_y**2)
-            return avg_mag
+            #avg_mag = math.sqrt(avg_force_x**2 + avg_force_y**2)
+            #return avg_mag
+            return math.sqrt(force_x**2 + force_y**2)
         else:
-            return avg_force_x, avg_force_y
-        
+            #return avg_force_x, avg_force_y
+            return force_x, force_y
         
 
