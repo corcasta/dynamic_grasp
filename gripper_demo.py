@@ -15,7 +15,7 @@ def main():
     with utilities.DeviceConnection.createTcpConnection(args) as router:
 
         example = Gripper(router)
-        example.gripper_width(0.5)        # example.gripper_vel(-0.1)
+        example.gripper_width(0)        # example.gripper_vel(-0.1)
 
 if __name__ == "__main__":
     main()

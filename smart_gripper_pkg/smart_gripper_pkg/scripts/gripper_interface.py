@@ -18,7 +18,7 @@ class Gripper:
         self.gripper_command = Base_pb2.GripperCommand()
         self.finger = self.gripper_command.gripper.finger.add()
 
-    def gripper_position(self):        
+    def position(self):        
         gripper_request = Base_pb2.GripperRequest()
         gripper_request.mode = Base_pb2.GRIPPER_POSITION
         gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
@@ -26,7 +26,7 @@ class Gripper:
         return position
 
         
-    def gripper_width(self,width):
+    def width(self,width):
         """
         width: type float, range value between (0-1)
         """
@@ -38,22 +38,23 @@ class Gripper:
         self.base.SendGripperCommand(self.gripper_command)
         time.sleep(self.sleep_time)
 
-    def gripper_vel(self,vel):
-        print ("Opening gripper using speed command...")
+    def vel(self,vel):
+        #print ("Controlling gripper using speed command...")
         self.gripper_command.mode = Base_pb2.GRIPPER_SPEED
         self.finger.value = vel
         self.base.SendGripperCommand(self.gripper_command)
         gripper_request = Base_pb2.GripperRequest()
 
-        # Wait for reported position to be opened
-        gripper_request.mode = Base_pb2.GRIPPER_SPEED
-        while True:
-            gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
-            if len(gripper_measure.finger):
-                if gripper_measure.finger[0].value == 0:
-                    break
-            else:
-                break
+        # Wait for reported speed to be 0
+        #gripper_request.mode = Base_pb2.GRIPPER_SPEED
+        #while True:
+        #    gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
+        #    if len (gripper_measure.finger):
+        #        #print("Current speed is : {0}".format(gripper_measure.finger[0].value))
+        #        if gripper_measure.finger[0].value == 0.0:
+        #            break
+        #    else: # Else, no finger present in answer, end loop
+        #        break
     
 
 def main():

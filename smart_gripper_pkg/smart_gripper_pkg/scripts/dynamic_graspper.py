@@ -4,86 +4,88 @@ import math
 # We are assuming we have access to the following classes
 from .gripper_interface import Gripper
 from tactile_sensor_pkg.scripts.tactile_force import TactileForce
+from .gelsight_interface import Gelsigth
+from simple_pid import PID
 
 
-class PID():
-    def __init__(self, kp, kd, ki):
-        """
-        kp: type float, CONTROLLER GAINS
-        ki: type float, CONTROLLER GAINS
-        kd: type float, CONTROLLER GAINS
-        """
-        self.accum = 0.0
-        self.prev_time = 0.0
-        self.delta_time = 0.0
-        self.prev_error = 0.0
-        
-        if kp:
-            self.kp = kp
-        else:
-            self.kp = 1.0
-
-        if ki:
-            self.ki = ki
-        else:
-            self.ki = 0.0
-
-        if kd:
-            self.kd = kd
-        else:
-            self.kd = 0.1
-
-
-    def update_time_variables(self):
-        self.delta_time = time.time() - self.prev_time
-        self.prev_time += self.delta_time
-
-
-    def update_prev_error(self, error):
-        self.prev_error = error
-
-
-    def update_gains(self, kp, kd, ki):
-        """
-        kp: type float, CONTROLLER GAINS
-        ki: type float, CONTROLLER GAINS
-        kd: type float, CONTROLLER GAINS
-        """
-        if kp:
-            self.kp = kp
-        if ki:
-            self.ki = ki
-        if kd:
-            self.kd = kd
-
-
-    def proportional_block(self, error):
-        return self.kp*error
-
-
-    def integral_block(self, error):
-        self.accum += self.ki*(error*self.delta_time)
-        return self.accum
-
-
-    def derivative_block(self, error):
-        return self.kd * (error - self.prev_error)/self.delta_time
-    
-    
-    def forward(self, error):
-        # MANDATORY to call first "update_time_variables" before calling PID blocks
-        self.update_time_variables()
-        
-        pid_output = self.proportional_block(error) + self.integral_block(error) + self.derivative_block(error)
-
-        # MANDATORY to call "update_prev_error" after calculating PID output
-        self.update_prev_error(error)
-
-        return pid_output
+#class PID():
+#    def __init__(self, kp, kd, ki):
+#        """
+#        kp: type float, CONTROLLER GAINS
+#        ki: type float, CONTROLLER GAINS
+#        kd: type float, CONTROLLER GAINS
+#        """
+#        self.accum = 0.0
+#        self.prev_time = 0.0
+#        self.delta_time = 0.0
+#        self.prev_error = 0.0
+#        
+#        if kp:
+#            self.kp = kp
+#        else:
+#            self.kp = 1.0
+#
+#        if ki:
+#            self.ki = ki
+#        else:
+#            self.ki = 0.0
+#
+#        if kd:
+#            self.kd = kd
+#        else:
+#            self.kd = 0.1
+#
+#
+#    def update_time_variables(self):
+#        self.delta_time = time.time() - self.prev_time
+#        self.prev_time += self.delta_time
+#
+#
+#    def update_prev_error(self, error):
+#        self.prev_error = error
+#
+#
+#    def update_gains(self, kp, kd, ki):
+#        """
+#        kp: type float, CONTROLLER GAINS
+#        ki: type float, CONTROLLER GAINS
+#        kd: type float, CONTROLLER GAINS
+#        """
+#        if kp:
+#            self.kp = kp
+#        if ki:
+#            self.ki = ki
+#        if kd:
+#            self.kd = kd
+#
+#
+#    def proportional_block(self, error):
+#        return self.kp*error
+#
+#
+#    def integral_block(self, error):
+#        self.accum += self.ki*error*self.delta_time
+#        return self.accum
+#
+#
+#    def derivative_block(self, error):
+#        return self.kd * (error - self.prev_error)/self.delta_time
+#    
+#    
+#    def forward(self, error):
+#        # MANDATORY to call first "update_time_variables" before calling PID blocks
+#        self.update_time_variables()
+#        
+#        pid_output = self.proportional_block(error) + self.integral_block(error) + self.derivative_block(error)
+#
+#        # MANDATORY to call "update_prev_error" after calculating PID output
+#        self.update_prev_error(error)
+#
+#        return pid_output
 
         
 class ForceController():
-    def __init__(self, router, camera_id, tactile_threshold, sleep_time, friction_coeff, max_output_val, min_output_val, gains):
+    def __init__(self, router, sleep_time, friction_coeff, max_output_val, min_output_val, gains):
         """
         router:             type ....
         camera_id:          type int
@@ -104,7 +106,7 @@ class ForceController():
         self.gripper_block = Gripper(router, sleep_time=sleep_time)
 
         # WE NEED TO DISCUSS HOW TactileInterface is really implemented
-        self.tactile_sensor_block = TactileForce(camera_id, tactile_threshold)
+        self.tactile_sensor_block = Gelsigth()
     
     # setpoint, measure_variable, external_tracking_signal
 
@@ -117,15 +119,16 @@ class ForceController():
         # maximum value we can actually get.
 
         # Min-max normalization
-        offset = (65 - self.min_output_val)/(self.max_output_val - self.min_output_val) 
-        normalized_error = (error - self.min_output_val)/(self.max_output_val - self.min_output_val) #+ offset 
+        normalized_error = (error - self.min_output_val)/(self.max_output_val - self.min_output_val)
         print(f"Normalized error: {normalized_error}")
         
-        delta_x = self.pid_block.forward(normalized_error)
-        delta_x = 0.1 * delta_x # FOR SAFETY WHILE TESTING ARM, DELETE ONCE 
+        #delta_x = self.pid_block.forward(normalized_error)
+        delta_x = self.pid_block(normalized_error)
+        #delta_x = 0.1 * delta_x # FOR SAFETY WHILE TESTING ARM, DELETE ONCE 
+        
         print(f"PID output: {delta_x}")
         
-        # The gripper block is receiving inputs between 0 and 1
+        # The gripper block is receiving inpcamera_id, tactile_thresholduts between 0 and 1
         # 0 means completely opened, 1 means completely closed
 
         # Given that we are not measuring the gripper distance
@@ -141,11 +144,11 @@ class ForceController():
         self.gripper_block.gripper_width(new_position)
         
 
-    def feedback(self, magnitude=False):
+    def feedback(self):
         """
         magnitude:  type bool
         """
-        force_x, force_y = self.tactile_sensor_block.get_components(self.tactile_sensor_block.cap)
+        fx, fy, fz = self.tactile_sensor_block.get_forces()
         
         #self.force_x_filter.append(force_x)
         #self.force_y_filter.append(force_y)
@@ -157,12 +160,6 @@ class ForceController():
         #avg_force_x = sum(self.force_x_filter)/len(self.force_x_filter)
         #avg_force_y = sum(self.force_y_filter)/len(self.force_y_filter)
         
-        if magnitude:
-            #avg_mag = math.sqrt(avg_force_x**2 + avg_force_y**2)
-            #return avg_mag
-            return math.sqrt(force_x**2 + force_y**2)
-        else:
-            #return avg_force_x, avg_force_y
-            return force_x, force_y
+        return fz
         
 
