@@ -38,23 +38,61 @@ class Gripper:
         self.base.SendGripperCommand(self.gripper_command)
         time.sleep(self.sleep_time)
 
-    def vel(self,vel):
+    def vel(self, vel):
         #print ("Controlling gripper using speed command...")
         self.gripper_command.mode = Base_pb2.GRIPPER_SPEED
         self.finger.value = vel
         self.base.SendGripperCommand(self.gripper_command)
-        gripper_request = Base_pb2.GripperRequest()
-
+        
         # Wait for reported speed to be 0
-        #gripper_request.mode = Base_pb2.GRIPPER_SPEED
-        #while True:
-        #    gripper_measure = self.base.GetMeasuredGripperMovement(gripper_request)
-        #    if len (gripper_measure.finger):
-        #        #print("Current speed is : {0}".format(gripper_measure.finger[0].value))
-        #        if gripper_measure.finger[0].value == 0.0:
-        #            break
-        #    else: # Else, no finger present in answer, end loop
-        #        break
+        gripper_pose_request = Base_pb2.GripperRequest()
+        gripper_pose_request.mode = Base_pb2.GRIPPER_POSITION
+
+        gripper_vel_request = Base_pb2.GripperRequest()
+        gripper_vel_request.mode = Base_pb2.GRIPPER_SPEED
+        speed_percentage_error = 0.01
+        
+        while True:
+            gripper_vel_measure = self.base.GetMeasuredGripperMovement(gripper_vel_request)
+            gripper_pose_measure = self.base.GetMeasuredGripperMovement(gripper_pose_request)
+            
+            if len (gripper_vel_measure.finger):
+                #print("Current speed is : {0}".format(gripper_measure.finger[0].value))
+                
+                
+                diff_speed = abs(abs(vel)-gripper_vel_measure.finger[0].value)/vel
+                print(f"Target Vel: {vel}, \t Current Vel: {gripper_vel_measure.finger[0].value} \t Diff_speed: {diff_speed}")
+                if diff_speed <= speed_percentage_error:
+                    self.finger.value = 0
+                    self.base.SendGripperCommand(self.gripper_command)
+                    print("Exiting command, vel achieved")
+                    break
+                # If Gripper is completely openned 
+                elif gripper_pose_measure.finger[0].value < 0.01:
+                    # We can assume when calling SendGripperCommand internally
+                    # has some flags that verifies if the gripper is completely 
+                    # open/close and cant keep moving thus is not necesseary to 
+                    # add:
+                    #    self.finger.value = 0
+                    #    self.base.SendGripperCommand(self.gripper_command)
+                    print("Gripper completely openned")
+                    break
+                # If Gripper is completely closed
+                elif gripper_pose_measure.finger[0].value >= 9.98:
+                    # We can assume when calling SendGripperCommand internally
+                    # has some flags that verifies if the gripper is completely 
+                    # open/close and cant keep moving thus is not necesseary to 
+                    # add:
+                    #    self.finger.value = 0
+                    #    self.base.SendGripperCommand(self.gripper_command)
+                    print("Gripper completely closed")
+                    break
+                # There is a 3 case where the finger cant keep
+                # moving beacuse of an object. Probably the internal
+                # command handles that case with force detection
+                # so no need to implemented ourselves.
+            else: # Else, no finger present in answer, end loop
+                break
     
 
 def main():
