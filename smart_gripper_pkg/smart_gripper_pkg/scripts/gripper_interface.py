@@ -27,7 +27,7 @@ class Gripper:
 
         
     def width(self,width):
-        """
+       GripperRequest """
         width: type float, range value between (0-1)
         """
         self.gripper_command.mode = Base_pb2.GRIPPER_POSITION
@@ -50,22 +50,37 @@ class Gripper:
 
         gripper_vel_request = Base_pb2.GripperRequest()
         gripper_vel_request.mode = Base_pb2.GRIPPER_SPEED
-        speed_percentage_error = 0.01
+        speed_percentage_error = 0.001
+        
+        #while True:
+        #    self.finger.value = vel
+        #    self.base.SendGripperCommand(self.gripper_command) 
         
         while True:
             gripper_vel_measure = self.base.GetMeasuredGripperMovement(gripper_vel_request)
             gripper_pose_measure = self.base.GetMeasuredGripperMovement(gripper_pose_request)
-            
+            #print("debug")
             if len (gripper_vel_measure.finger):
                 #print("Current speed is : {0}".format(gripper_measure.finger[0].value))
                 
-                
                 diff_speed = abs(abs(vel)-gripper_vel_measure.finger[0].value)/vel
-                print(f"Target Vel: {vel}, \t Current Vel: {gripper_vel_measure.finger[0].value} \t Diff_speed: {diff_speed}")
+                #print(f"Target Vel: {vel}, \t Current Vel: {gripper_vel_measure.finger[0].value} \t Diff_speed: {diff_speed}")
+                
+                # If target vel is not enough to make the gripper move
+                #if abs(vel) < 0.009:
+                #    #print("Not enough vel to make gripper move. Setting to min: 0.01")
+                #    if vel < 0:
+                #        self.finger.value = -0.009
+                #    else:
+                #        self.finger.value = 0.009
+                #    self.base.SendGripperCommand(self.gripper_command)
+                #    break
+                # If achieved speed is within the range
                 if diff_speed <= speed_percentage_error:
                     self.finger.value = 0
                     self.base.SendGripperCommand(self.gripper_command)
-                    print("Exiting command, vel achieved")
+                    
+                    #print("Exiting command, vel achieved")
                     break
                 # If Gripper is completely openned 
                 elif gripper_pose_measure.finger[0].value < 0.01:
@@ -75,7 +90,8 @@ class Gripper:
                     # add:
                     #    self.finger.value = 0
                     #    self.base.SendGripperCommand(self.gripper_command)
-                    print("Gripper completely openned")
+                    
+                    #print("Gripper completely openned")
                     break
                 # If Gripper is completely closed
                 elif gripper_pose_measure.finger[0].value >= 9.98:
@@ -85,7 +101,8 @@ class Gripper:
                     # add:
                     #    self.finger.value = 0
                     #    self.base.SendGripperCommand(self.gripper_command)
-                    print("Gripper completely closed")
+                    
+                    #print("Gripper completely closed")
                     break
                 # There is a 3 case where the finger cant keep
                 # moving beacuse of an object. Probably the internal
